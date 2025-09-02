@@ -588,3 +588,157 @@ SELECT NULLIF('123', '123')
     ,NULLIF('1234', '123') FROM DUAL;
 
 
+
+--============================================================================================
+--                              <선택 함수>
+--============================================================================================
+/*  
+    * DECODE(비교하고자하는 대상(컬럼|산술연산|함수식), 비교값1, 결과값1, 비교값2, 결과값2, ... , DEFAULT값 )
+      비교값1 -> 결과값1, 비교값2 -> 결과값2, ...  
+      SWITCH(비교대상) (
+        CASE 비교값1:
+            결과값1;
+        CASE 비교값1:
+            결과값1;
+            ...
+      ) 
+      코드에서 스위치구문과 같다. (데베는 스위치 구문이 없다.) 
+*/
+
+-- EMPLOYEE 테이블에서 사번, 사원명, 주민번호, 성별 
+SELECT EMP_ID, EMP_NAME, EMP_NO, DECODE(SUBSTR(EMP_NO,8,1),1,'남',2,'여',3,'남',4,'여')||'자' 성별 
+FROM EMPLOYEE;
+
+-- EMPLOYEE 테이블에서 사번, 사원명, 직급코드, 각 직급별로 인상한 급여 조회
+    -- J7인 사원은 급여를 10% 인상
+    -- J9인 사원은 급여를 15% 인상 
+    -- J5인 사원은 급여를 20% 인상 
+    -- 이외 모든 사원은 급여를 5% 인상 
+    
+SELECT EMP_ID, EMP_NAME, JOB_CODE, 
+    DECODE(JOB_CODE
+        ,'J7',SALARY*1.1
+        ,'J9',SALARY*1.15
+        ,'J5',SALARY*1.2
+        , SALARY*1.05) "인상된 급여" 
+    , SALARY 이전급여
+FROM EMPLOYEE;
+
+---------------------------------------------------------------
+/*
+    * CASE WHEN THEN 
+      THEN
+      
+      CASE WHEN 조건식1 THEN 결과값1
+           WHEN 조건식2 THEN 결과값2
+           ...
+           ELSE 결과값N
+      END
+      
+      * 프로그램 IF - ELSE 와 동일
+    
+*/
+-- EMPLOYEE 테이블에서 사원명, 급여, 급여에 따른 등급 
+    -- 고급 : 5백만원 이상 인 사원
+    -- 중급 : 5백만원 미만 3백만원 이상 인 사원
+    -- 초급 : 3백만원 미만 인 사원
+    
+SELECT EMP_NAME, SALARY, 
+    CASE WHEN SALARY >= 5000000 THEN '고급'
+         WHEN SALARY >= 3000000 THEN '중급'
+         ELSE '초급'
+    END AS 등급
+FROM EMPLOYEE;
+
+
+--============================================================================================
+--                              <그룹 함수>
+--============================================================================================
+/*
+    * SUM(컬럼(NUMBER타입) ) : 해당 컬럼값들의 합계를 구해 반환하는 함수 
+*/
+-- 행 10개 -> 1개  그룹함수 
+
+-- EMPLOYEE 테이블에서 전 사원의 급여의 합 
+SELECT SUM(SALARY) 급여합계
+FROM EMPLOYEE;
+    
+-- EMPLOYEE 테이블에서 남자사원의 급여의 합 
+SELECT SUM(SALARY) "남자사원의 급여합계"
+FROM EMPLOYEE
+WHERE DECODE(SUBSTR(EMP_NO,8,1),1,'남',3,'남','여') = '남';
+
+SELECT SUM(SALARY) "남자사원의 급여합계"
+FROM EMPLOYEE
+WHERE DECODE(SUBSTR(EMP_NO,8,1),1,'남',3,'남','여') = '남';
+--조건을 주기때문에 여자를 받아도 됨 
+
+-- EMPLOYEE 부서코드가 D5인 사원의 총 급여
+SELECT SUM(SALARY) "D5인 사원들의 급여합계"
+FROM EMPLOYEE
+WHERE DEPT_CODE ='D5';
+
+-- EMPLOYEE 부서코드가 D5인 사원의 총 연봉(보너스 포함)의 합 조회
+SELECT SUM((1 + NVL(BONUS,0))*SALARY*12) "D5인 사원들의 연봉합계"
+FROM EMPLOYEE
+WHERE DEPT_CODE ='D5';
+
+-- EMPLOYEE 테이블에서 전 사원의 급여의 합 (출력 : \111,111,111)
+SELECT TO_CHAR(SUM(SALARY), 'L999,999,999') "전 사원들의 급여합계"
+FROM EMPLOYEE;
+
+-------------------------------------------------------------------------------------------------
+/*
+    * AVG(컬럼(NUMBER타입)) : 해당 컬럼값들의 평균 
+*/
+
+-- EMPLOYEE 테이블에서 전 사원의 급여의 평균 
+SELECT CEIL(AVG(SALARY)) 급여평균
+FROM EMPLOYEE;
+    
+SELECT ROUND(AVG(SALARY),2) 급여평균
+FROM EMPLOYEE;
+
+-------------------------------------------------------------------------------------------------
+/*
+    * MIN(컬럼(모든타입)) : 해당 컬럼 값들 중 가장 작은값 반환
+    * MAX(컬럼(모든타입)) : 해당 컬럼 값들 중 가장 큰값 반환
+*/
+SELECT MIN(EMP_NAME) , MIN(HIRE_DATE), MIN(SALARY)
+FROM EMPLOYEE;
+
+SELECT MAX(EMP_NAME) , MAX(HIRE_DATE), MAX(SALARY)
+FROM EMPLOYEE;
+
+-----------------------------------------------------------
+/*
+    * COUNT(*|컬럼|DISTINCT컬럼) : 행의 갯수 반환
+    
+    - COUNT(*) : 조회된 결과의 모든 행의 갯수 반환  
+    - COUNT(컬럼) : 제시한 컬럼의 NULL값을 제외한 행의 갯수 반환  
+    - COUNT(DISTINCT컬럼) : 해당 컬럼값에서 중복을 제거한 행의 갯수 반환  
+    
+*/
+
+-- EMPOYEE 테이블에서 전체 사원의 수
+SELECT COUNT(*)
+FROM EMPLOYEE;
+
+-- EMPOYEE 테이블에서 여자 사원의 수
+SELECT COUNT(*)
+FROM EMPLOYEE
+WHERE SUBSTR(EMP_NO,8,1) IN (2,4);
+
+-- EMPOYEE 테이블에서 보너스를 받는 사원의 수
+SELECT COUNT(BONUS)
+FROM EMPLOYEE;
+
+
+-- EMPOYEE 테이블에서 부서배치를 받은 사원의 수
+SELECT COUNT(DEPT_CODE)
+FROM EMPLOYEE;
+
+
+-- EMPOYEE 테이블에서 현재 사원이 총 몇개의 부서에 분포되어있는지 사원의 수
+SELECT COUNT(DISTINCT DEPT_CODE)
+FROM EMPLOYEE;

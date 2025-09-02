@@ -51,20 +51,27 @@ SELECT EMP_NAME, DEPT_CODE, (1 + NVL(BONUS,0))*SALARY*12 연봉
 FROM EMPLOYEE
 WHERE DEPT_CODE = 'D5';
 -- 완
-
+SELECT SUM((1 + NVL(BONUS,0))*SALARY*12) "D5인 사원들의 연봉합계"
+FROM EMPLOYEE
+WHERE DEPT_CODE ='D5';
 
 -- 11. EMPLOYEE테이블에서 직원들의 입사일로부터 년도만 가지고 각 년도별 입사 인원수 조회
 --      전체 직원 수, 2001년, 2002년, 2003년, 2004년
-SELECT TO_CHAR(TO_DATE(SUBSTR(HIRE_DATE,1,2),'RR'),'RRRR')
-FROM EMPLOYEE;
--- 인원수를 못구함 GG
 
+SELECT COUNT(*) "전체 직원 수", SUM(HIRE_DATE LIKE '01%') "2001년", SUM(HIRE_DATE LIKE '02%') "2002년",SUM(HIRE_DATE LIKE '03%') "2003년",SUM(HIRE_DATE LIKE '04%') "2004년" 
+FROM EMPLOYEE;
 -- 8. EMPLOYEE테이블에서 부서코드가 D5, D6, D9인 사원만 조회하되 D5면 총무부
 --   , D6면 기획부, D9면 영업부로 처리(EMP_ID, EMP_NAME, DEPT_CODE, 총무부)
 --    (단, 부서코드 오름차순으로 정렬)
-SELECT EMP_NAME, DEPT_CODE
+SELECT EMP_NAME, DEPT_CODE,
+CASE DEPT_CODE
+            WHEN 'D6' THEN '기획부'
+            WHEN 'D5' THEN '총무부'
+            WHEN 'D9' THEN '영업부'
+       END AS 부서이름
 FROM EMPLOYEE
-WHERE DEPT_CODE IN ('D5','D6','D9');
+WHERE DEPT_CODE IN ('D5','D6','D9')
+ORDER BY DEPT_CODE;
 
 
 
