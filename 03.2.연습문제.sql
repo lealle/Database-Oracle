@@ -60,6 +60,9 @@ WHERE DEPT_CODE ='D5';
 
 SELECT COUNT(*) "전체 직원 수", SUM(HIRE_DATE LIKE '01%') "2001년", SUM(HIRE_DATE LIKE '02%') "2002년",SUM(HIRE_DATE LIKE '03%') "2003년",SUM(HIRE_DATE LIKE '04%') "2004년" 
 FROM EMPLOYEE;
+
+
+--COUNT(DECODE(EXTRACT(YEAR FROM HIRE_DATE),'2001',1))
 -- 8. EMPLOYEE테이블에서 부서코드가 D5, D6, D9인 사원만 조회하되 D5면 총무부
 --   , D6면 기획부, D9면 영업부로 처리(EMP_ID, EMP_NAME, DEPT_CODE, 총무부)
 --    (단, 부서코드 오름차순으로 정렬)
