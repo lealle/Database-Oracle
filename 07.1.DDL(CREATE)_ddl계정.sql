@@ -82,9 +82,6 @@ COMMENT ON COLUMN MEMBER.MEM_DATE IS '회원가입일';
 -- INSERT INTO 테이블명 VALUES();
 
 INSERT INTO MEMBER VALUES(1,'user1','pass01','김민준','남','010-1234-5678','kim@naver.com','2025.09.04');
--- date / - 다 가능 
-INSERT INTO MEMBER VALUES(001,'LEALLE','1234','이정민','남','010-1234-5678','EMAIL','2025.09.04');
-
 
 
 
